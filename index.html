@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stamp Duty BD &#x2014; Bangladesh Stamp Duty &amp; Deed Registration Cost Calculator</title>
+<meta name="description" content="Offline bilingual calculator for Bangladesh stamp duty and deed registration costs: sale deeds, gift, mortgage, lease, power of attorney and the full Schedule I duty table.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1 data-i18n="title">Stamp Duty BD</h1>
+    <p class="sub" data-i18n="subtitle">Bangladesh stamp duty &amp; deed registration cost calculator</p>
+    <button id="langBtn" class="lang" type="button">&#x9ac;&#x9be;&#x982;&#x9b2;&#x9be;</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab active" data-tab="sale" role="tab" aria-selected="true" data-i18n="tabSale">Sale Deed</button>
+    <button class="tab" data-tab="other" role="tab" aria-selected="false" data-i18n="tabOther">Other Deeds</button>
+    <button class="tab" data-tab="lookup" role="tab" aria-selected="false" data-i18n="tabLookup">Duty Lookup</button>
+    <button class="tab" data-tab="history" role="tab" aria-selected="false" data-i18n="tabHistory">History</button>
+  </nav>
+
+  <!-- ============ SALE DEED ============ -->
+  <section id="tab-sale" class="panel" role="tabpanel">
+    <h2 data-i18n="saleHeading">Sale deed registration cost</h2>
+    <form id="saleForm" novalidate>
+      <label class="field">
+        <span data-i18n="deedValue">Deed value (&#x9f3;)</span>
+        <input id="deedValue" type="number" inputmode="numeric" min="1" step="1" placeholder="5000000" required>
+        <small data-i18n="deedValueHint">Value written in the deed, in Taka.</small>
+      </label>
+
+      <fieldset class="field">
+        <legend data-i18n="area">Location</legend>
+        <label class="radio"><input type="radio" name="area" value="city" checked> <span data-i18n="areaCity">City corporation / cantonment (LG tax 2%)</span></label>
+        <label class="radio"><input type="radio" name="area" value="other"> <span data-i18n="areaOther">Other area (LG tax 3%)</span></label>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend data-i18n="kind">Property type</legend>
+        <label class="radio"><input type="radio" name="kind" value="land" checked> <span data-i18n="kindLand">Land</span></label>
+        <label class="radio"><input type="radio" name="kind" value="flat-old"> <span data-i18n="kindFlatOld">Flat &#x2014; resale (no VAT)</span></label>
+        <label class="radio"><input type="radio" name="kind" value="flat-new"> <span data-i18n="kindFlatNew">Flat &#x2014; new from developer (VAT applies)</span></label>
+      </fieldset>
+
+      <label class="field hidden" id="sqftWrap">
+        <span data-i18n="sqft">Flat size (sq ft)</span>
+        <input id="sqft" type="number" inputmode="numeric" min="1" max="100000" step="1" placeholder="1200">
+        <small data-i18n="sqftHint">VAT is 2% up to 1,600 sq ft, 4.5% above.</small>
+      </label>
+
+      <fieldset class="field">
+        <legend data-i18n="sourceTax">Source tax (Income Tax Act ss.125/126)</legend>
+        <label class="radio"><input type="radio" name="srcMode" value="none" checked> <span data-i18n="sourceNone">Not included</span></label>
+        <label class="radio"><input type="radio" name="srcMode" value="amount"> <span data-i18n="sourceAmount">Enter amount (&#x9f3;)</span></label>
+        <label class="radio"><input type="radio" name="srcMode" value="percent"> <span data-i18n="sourcePercent">Enter rate (%)</span></label>
+        <input id="sourceValue" type="number" inputmode="decimal" min="0" step="any" class="hidden" aria-label="Source tax">
+        <small data-i18n="sourceHint">Source tax is area-based (mouza). Enter the figure your sub-registry quotes.</small>
+      </fieldset>
+
+      <label class="check">
+        <input id="affidavit" type="checkbox" checked>
+        <span data-i18n="affidavit">Include seller&#x2019;s affidavit stamp paper (&#x9f3;300)</span>
+      </label>
+
+      <p class="error" id="saleError" role="alert" hidden></p>
+
+      <div class="actions">
+        <button type="submit" class="btn primary" data-i18n="calcBtn">Calculate</button>
+        <button type="button" class="btn" id="saleClear" data-i18n="clearBtn">Clear</button>
+      </div>
+    </form>
+
+    <div id="saleResult" class="result" hidden>
+      <h3 data-i18n="resultHeading">Registration cost breakdown</h3>
+      <dl id="saleLines" class="lines"></dl>
+      <p class="total"><span data-i18n="total">Total payable</span>: <strong id="saleTotal"></strong> <span class="muted" id="salePct"></span></p>
+      <p class="note" id="saleCapNote" hidden data-i18n="cappedNote">Stamp duty capped at &#x9f3;2 crore (Schedule I, No. 22).</p>
+      <button type="button" class="btn" id="saleSave" data-i18n="saveBtn">Save to history</button>
+      <p class="ok" id="saleSaved" hidden data-i18n="savedMsg">Saved to history.</p>
+    </div>
+
+    <p class="note" data-i18n="proposalNote">Note: an Oct 2026 government committee proposed halving stamp duty to 0.75% &#x2014; a proposal, not law. This app uses the rates in force.</p>
+  </section>
+
+  <!-- ============ OTHER DEEDS ============ -->
+  <section id="tab-other" class="panel" role="tabpanel" hidden>
+    <h2 data-i18n="otherHeading">Other deeds &#x2014; stamp duty</h2>
+    <form id="otherForm" novalidate>
+      <label class="field">
+        <span data-i18n="instrument">Instrument</span>
+        <select id="instrument"></select>
+      </label>
+      <p class="note" id="instNote"></p>
+
+      <label class="field" id="otherValueWrap">
+        <span data-i18n="amountLabel">Amount (&#x9f3;)</span>
+        <input id="otherValue" type="number" inputmode="numeric" min="1" step="1" placeholder="1000000">
+        <small data-i18n="amountHint">Property value / loan amount / dower / capital, as the Schedule charges it.</small>
+      </label>
+
+      <div id="leaseFields" hidden>
+        <label class="field">
+          <span data-i18n="termYears">Lease term (years)</span>
+          <input id="termYears" type="number" inputmode="numeric" min="1" max="99" step="1" placeholder="10">
+        </label>
+        <label class="field">
+          <span data-i18n="annualRent">Average annual rent (&#x9f3;)</span>
+          <input id="annualRent" type="number" inputmode="numeric" min="1" step="1" placeholder="120000">
+        </label>
+        <label class="check"><input id="premium" type="checkbox"> <span data-i18n="premium">Premium paid / other case (0.4%)</span></label>
+      </div>
+
+      <div id="termFields" hidden>
+        <label class="check"><input id="shortTerm" type="checkbox"> <span data-i18n="shortTerm">Repayable within 3 months</span></label>
+      </div>
+
+      <div id="poaFields" hidden>
+        <fieldset class="field">
+          <legend data-i18n="poaType">Power of attorney type</legend>
+          <label class="radio"><input type="radio" name="poaType" value="a" checked> <span data-i18n="poaA">(a) Registration only &#x2014; &#x9f3;800</span></label>
+          <label class="radio"><input type="radio" name="poaType" value="b"> <span data-i18n="poaB">(b) Under PoA Act 2012 s.2(7) &#x2014; &#x9f3;1,500</span></label>
+          <label class="radio"><input type="radio" name="poaType" value="c"> <span data-i18n="poaC">(c) Loanee to bank / FI &#x2014; &#x9f3;2,000</span></label>
+          <label class="radio"><input type="radio" name="poaType" value="d"> <span data-i18n="poaD">(d) Irrevocable, no consideration &#x2014; &#x9f3;1,500</span></label>
+          <label class="radio"><input type="radio" name="poaType" value="e"> <span data-i18n="poaE">(e) Irrevocable, for consideration &#x2014; 1.5%</span></label>
+        </fieldset>
+        <label class="field hidden" id="poaValueWrap">
+          <span data-i18n="poaValue">Consideration (&#x9f3;)</span>
+          <input id="poaValue" type="number" inputmode="numeric" min="1" step="1" placeholder="500000">
+        </label>
+      </div>
+
+      <p class="error" id="otherError" role="alert" hidden></p>
+
+      <div class="actions">
+        <button type="submit" class="btn primary" data-i18n="calcBtn">Calculate</button>
+        <button type="button" class="btn" id="otherClear" data-i18n="clearBtn">Clear</button>
+      </div>
+    </form>
+
+    <div id="otherResult" class="result" hidden>
+      <h3 data-i18n="dutyPayable">Stamp duty payable</h3>
+      <p class="big" id="otherDuty"></p>
+      <p class="muted"><span data-i18n="artNote">Schedule I, Article</span> <span id="otherArt"></span></p>
+      <button type="button" class="btn" id="otherSave" data-i18n="saveBtn">Save to history</button>
+      <p class="ok" id="otherSaved" hidden data-i18n="savedMsg">Saved to history.</p>
+    </div>
+  </section>
+
+  <!-- ============ LOOKUP ============ -->
+  <section id="tab-lookup" class="panel" role="tabpanel" hidden>
+    <h2 data-i18n="lookupHeading">Fixed-duty lookup &#x2014; Stamp Act 1899, Schedule I</h2>
+    <label class="field">
+      <span class="sr" data-i18n="lookupSearch">Search instrument (e.g. affidavit, lease, 47)&#x2026;</span>
+      <input id="lookupSearch" type="search" data-i18n-ph="lookupSearch" placeholder="Search instrument (e.g. affidavit, lease, 47)&#x2026;">
+    </label>
+    <p class="muted"><span id="lookupCount"></span></p>
+    <div class="table-wrap">
+      <table id="lookupTable">
+        <thead>
+          <tr>
+            <th data-i18n="colArt">Art.</th>
+            <th data-i18n="colInstrument">Instrument</th>
+            <th data-i18n="colDuty">Proper stamp duty</th>
+          </tr>
+        </thead>
+        <tbody id="lookupBody"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="lookupEmpty" hidden data-i18n="lookupEmpty">No instrument matches your search.</p>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="tab-history" class="panel" role="tabpanel" hidden>
+    <h2 data-i18n="histHeading">Saved calculations</h2>
+    <div class="actions">
+      <button type="button" class="btn" id="exportBtn" data-i18n="exportBtn">Export JSON</button>
+      <button type="button" class="btn" id="importBtn" data-i18n="importBtn">Import JSON</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button type="button" class="btn danger" id="eraseBtn" data-i18n="eraseBtn">Erase all</button>
+    </div>
+    <p class="ok" id="histMsg" hidden></p>
+    <ul id="histList" class="hist"></ul>
+    <p class="empty" id="histEmpty" data-i18n="histEmpty">Nothing saved yet. Calculate a deed, then tap &#x201c;Save to history&#x201d;.</p>
+  </section>
+
+  <footer>
+    <p data-i18n="footer">Rates from Stamp Act 1899 Schedule I (Finance Act 2022) and sub-registry schedules. Planning estimate only &#x2014; not legal or tax advice. Confirm current rates at your sub-registry office before paying.</p>
+    <p class="muted" data-i18n="offline">100% offline &#x2014; your figures never leave this device.</p>
+  </footer>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
